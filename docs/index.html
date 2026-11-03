@@ -323,15 +323,18 @@ footer {
 <section>
   <h2><span class="num">4</span> 安装</h2>
 
-  <p>没有安装脚本。把 skill 目录复制或软链接到你 agent 工具的 skills 目录即可：</p>
+  <p>没有安装脚本。先把仓库克隆到本地，再把 skill 目录复制或软链接到你 agent 工具的 skills 目录：</p>
 
-  <pre><code># 以 pi coding agent 为例
+  <pre><code># 1. 克隆仓库到本地
+git clone https://github.com/kuwii/put-on-record.git
+
+# 2. 以 pi coding agent 为例，软链接（或复制）skill 目录
 ln -s /path/to/put-on-record/skills-cn/put-on-record ~/.pi/agent/skills/put-on-record
 
 # 或者复制
 cp -r /path/to/put-on-record/skills-cn/put-on-record ~/.pi/agent/skills/</code></pre>
 
-  <p class="muted">其他 agent 工具（Claude Code、Codex 等）同理，放到各自的 skills 目录即可。</p>
+  <p class="muted">其他 agent 工具（Claude Code、Codex 等）同理，放到各自的 skills 目录即可。如果不确定自己的 agent 工具的 skills 目录在哪里，直接问它一句就行。</p>
 </section>
 
 <div class="end-mark">· · ·</div>
