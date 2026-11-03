@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Put on Record · 记录在案</title>
+<!-- 防闪烁：首次绘制前恢复主题 -->
+<script>
+(function(){var t=null;try{t=localStorage.getItem('por-theme');}catch(e){}if(!t)t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.setAttribute('data-theme',t);})();
+</script>
+<style>
+:root {
+  --primary: #3b82f6;
+  --primary-light: #1e3a5f;
+  --primary-soft: #1e3a5f;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-light: #64748b;
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --border: #334155;
+  --accent: #f97316;
+  --accent-light: #3d1f0a;
+  --green: #10b981;
+  --green-light: #0d2e1f;
+  --purple: #8b5cf6;
+  --purple-light: #2d1f4e;
+  --radius: 10px;
+  --max-width: 1152px;
+}
+
+[data-theme="light"] {
+  --primary: #2563eb;
+  --primary-light: #eff6ff;
+  --primary-soft: #dbeafe;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --border: #e2e8f0;
+  --accent: #ea580c;
+  --accent-light: #fff7ed;
+  --green: #059669;
+  --green-light: #ecfdf5;
+  --purple: #7c3aed;
+  --purple-light: #f5f3ff;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.85;
+  font-size: 17px;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+header {
+  padding: 88px 0 48px;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 2.4em;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+header .subtitle {
+  font-size: 1.1em;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+section {
+  padding: 32px 0;
+  border-bottom: 1px solid var(--border);
+  transition: border-color 0.3s;
+}
+
+section:last-of-type { border-bottom: none; }
+
+h2 {
+  font-size: 1.5em;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+h2 .num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  color: white;
+  border-radius: 8px;
+  font-size: 0.75em;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+p {
+  margin-bottom: 14px;
+  color: var(--text);
+}
+
+p.muted {
+  color: var(--text-muted);
+  font-size: 0.95em;
+}
+
+strong { color: var(--accent); font-weight: 700; }
+
+.container a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+.container a:hover { text-decoration: underline; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin: 20px 0;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.card code,
+:not(pre) > code {
+  background: var(--primary-light);
+  color: var(--primary);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+}
+
+pre {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  overflow-x: auto;
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+  font-size: 0.88em;
+  line-height: 1.7;
+  margin: 16px 0;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+pre code { background: none; color: var(--text); padding: 0; font-size: 1em; }
+
+ul {
+  margin: 10px 0 16px 20px;
+}
+
+ul li {
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+/* ── 左上角 GitHub 按钮 ── */
+.github-btn {
+  position: fixed;
+  top: 16px;
+  left: 20px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  transition: background-color 0.3s, border-color 0.2s;
+}
+.github-btn:hover { border-color: var(--primary); }
+.github-btn img { width: 100%; height: 100%; object-fit: contain; display: none; }
+[data-theme="light"] .github-btn img.gh-black { display: block; }
+[data-theme="dark"] .github-btn img.gh-white { display: block; }
+
+/* ── 主题切换按钮 ── */
+.theme-switcher {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  z-index: 100;
+}
+.theme-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
+  line-height: 1;
+  padding: 0;
+}
+.theme-btn:hover {
+  border-color: var(--primary);
+}
+[data-theme="light"] .theme-btn[data-theme="light"],
+[data-theme="dark"] .theme-btn[data-theme="dark"] {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+footer {
+  padding: 48px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9em;
+}
+
+.end-mark {
+  text-align: center;
+  font-size: 1.5em;
+  color: var(--text-light);
+  padding: 24px 0;
+  letter-spacing: 0.3em;
+}
+
+@media (max-width: 600px) {
+  header { padding: 72px 0 32px; }
+  header h1 { font-size: 1.8em; }
+  section { padding: 24px 0; }
+  body { font-size: 16px; }
+  h2 { font-size: 1.3em; }
+}
+</style>
+</head>
+<body>
+
+<a class="github-btn" href="https://github.com/kuwii/put-on-record" target="_blank" rel="noopener" aria-label="GitHub 仓库" title="GitHub 仓库">
+  <img class="gh-black" src="resources/github-black.svg" alt="">
+  <img class="gh-white" src="resources/github-white.svg" alt="">
+</a>
+
+<div class="theme-switcher">
+  <button class="theme-btn" data-theme="light" aria-label="亮色模式" title="亮色模式">☀️</button>
+  <button class="theme-btn" data-theme="dark" aria-label="暗色模式" title="暗色模式">🌙</button>
+</div>
+
+<div class="container">
+
+<header>
+  <h1>“记录在案”</h1>
+  <p class="subtitle">面向“工作要留痕”的 agent skill</p>
+</header>
+
+<!-- ==================== 这是什么 ==================== -->
+<section>
+  <h2><span class="num">1</span> 这是什么</h2>
+
+  <p>这个项目是一个 agent skill：<strong>put-on-record（记录在案）</strong>。它把当前 session 中<strong>已经做过的工作</strong>总结成一份客观、极简的 Markdown 记录文件，作为日后的工作历史。</p>
+
+  <p>很多工作场景需要"留痕"：定期写述职报告，要能列出这段时间做过什么；工作中产生争端时，精确的工作记录是有利的证据。这个 skill 写出的记录可以直接作为这些场景的素材。</p>
+
+  <div class="card">
+    <p><strong>怎么触发</strong>：对 agent 说"记录在案"或 "Put on record"，或者用自然语言要求做工作记录、留存证据、工作日志、述职素材等。</p>
+  </div>
+</section>
+
+<!-- ==================== 怎么用 ==================== -->
+<section>
+  <h2><span class="num">2</span> 怎么用</h2>
+
+  <p>调用时告诉它写到哪里：</p>
+
+  <ul>
+    <li><strong>指定一个 Markdown 文件路径</strong>：记录写进那个文件；文件已存在时视为更新那份记录。</li>
+    <li><strong>指定一个目录</strong>：在目录中生成记录文件，文件名固定为 <code>YYYY-MM-DD-record-{x}-{work-content}.md</code>：日期精确到天，<code>x</code> 是从 1 开始的当日序号（同日已有记录时取当前最大值 +1），<code>work-content</code> 是几个英文单词 + 连字符的内容概括。例如 <code>2025-11-03-record-1-fix-login-bug.md</code>。</li>
+    <li><strong>什么都没指定</strong>：如果用户或项目上下文中已经明确指定了用于本 skill 的记录目录，就用那个目录；否则拒绝执行，要求提供目录或文件路径。</li>
+  </ul>
+</section>
+
+<!-- ==================== 记录什么 ==================== -->
+<section>
+  <h2><span class="num">3</span> 记录什么</h2>
+
+  <p>记录的内容规则：</p>
+
+  <ul>
+    <li><strong>只记已完成的事实</strong>：写了什么代码、写了什么文档、运行了什么命令、调研了什么、提交或沟通了什么。</li>
+    <li><strong>不记</strong>未来计划、未完成部分、未查明的事实、推测；不做任何修饰。</li>
+    <li>正文记录<strong>精确到分钟、带时区</strong>的时间；上下文中已有工作时间区间或重要时刻时记那些，否则记录本次写记录的时刻。</li>
+    <li>处于 git 仓库且改动<strong>已提交</strong>时，记录 commit ID。</li>
+    <li>一次调用只产出一个文件；本 session 已经用过一次时，只记录上次记录之后的增量。</li>
+  </ul>
+
+  <p>如果目标目录里已有与本次工作内容<strong>高度相似</strong>的记录，skill 会停下来询问是否合并进那份既有记录。合并后会把整个文件改写成一次成文的样式（时间部分保持不变），并重新检查文件名中的工作内容概括是否仍然贴切。</p>
+</section>
+
+<!-- ==================== 安装 ==================== -->
+<section>
+  <h2><span class="num">4</span> 安装</h2>
+
+  <p>没有安装脚本。把 skill 目录复制或软链接到你 agent 工具的 skills 目录即可：</p>
+
+  <pre><code># 以 pi coding agent 为例
+ln -s /path/to/put-on-record/skills-cn/put-on-record ~/.pi/agent/skills/put-on-record
+
+# 或者复制
+cp -r /path/to/put-on-record/skills-cn/put-on-record ~/.pi/agent/skills/</code></pre>
+
+  <p class="muted">其他 agent 工具（Claude Code、Codex 等）同理，放到各自的 skills 目录即可。</p>
+</section>
+
+<div class="end-mark">· · ·</div>
+
+<footer>MIT License · 源码：<a href="https://github.com/kuwii/put-on-record" target="_blank" rel="noopener">github.com/kuwii/put-on-record</a></footer>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var html = document.documentElement;
+  document.querySelectorAll('.theme-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var theme = this.getAttribute('data-theme');
+      html.setAttribute('data-theme', theme);
+      try { localStorage.setItem('por-theme', theme); } catch (e) {}
+    });
+  });
+});
+</script>
+</body>
+</html>
