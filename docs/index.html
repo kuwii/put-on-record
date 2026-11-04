@@ -280,12 +280,17 @@ footer {
 <section>
   <h2><span class="num">1</span> 这是什么</h2>
 
-  <p>这个项目是一个 agent skill：<strong>put-on-record（记录在案）</strong>。它把当前 session 中<strong>已经做过的工作</strong>总结成一份客观、极简的 Markdown 记录文件，作为日后的工作历史。</p>
+  <p>这个项目是一个 agent skill：<strong>put-on-record（记录在案）</strong>。它把当前 session 相关的事情整理成客观、极简的 Markdown 文件，作为日后的工作历史，分两类：</p>
 
-  <p>很多工作场景需要"留痕"：定期写述职报告，要能列出这段时间做过什么；工作中产生争端时，精确的工作记录是有利的证据。这个 skill 写出的记录可以直接作为这些场景的素材。</p>
+  <ul>
+    <li><strong>工作记录</strong>（<code>record</code>）：把<strong>已经做过的工作</strong>总结成工作记录——只记已发生的事实，不记计划与推测。</li>
+    <li><strong>任务记录</strong>（<code>task</code>）：把<strong>布置给你的工作任务/计划</strong>记成一份本地自包含的任务文件——隔段时间后，只读这个文件就能重新理解任务。</li>
+  </ul>
+
+  <p>很多工作场景需要"留痕"：定期写述职报告，要能列出这段时间做过什么；工作中产生争端时，精确的工作记录是有利的证据；任务安排下来过了一阵子，也需要能完整回忆起任务的内容和背景。这个 skill 写出的记录可以直接作为这些场景的素材。</p>
 
   <div class="card">
-    <p><strong>怎么触发</strong>：对 agent 说"记录在案"或 "Put on record"，或者用自然语言要求做工作记录、留存证据、工作日志、述职素材等。</p>
+    <p><strong>怎么触发</strong>：对 agent 说"记录在案"或 "Put on record"，或者用自然语言要求做工作记录、留存证据、工作日志、述职素材等；记录任务则说"记录任务"、"任务留痕"、"记录布置给我的任务"等。没说记哪一类时，skill 会根据 session 内容自动判断（有已完成的工作记工作，刚领的活记任务）。</p>
   </div>
 </section>
 
@@ -297,7 +302,7 @@ footer {
 
   <ul>
     <li><strong>指定一个 Markdown 文件路径</strong>：记录写进那个文件；文件已存在时视为更新那份记录。</li>
-    <li><strong>指定一个目录</strong>：在目录中生成记录文件，文件名固定为 <code>YYYY-MM-DD-record-{x}-{work-content}.md</code>：日期精确到天，<code>x</code> 是从 1 开始的当日序号（同日已有记录时取当前最大值 +1），<code>work-content</code> 是几个英文单词 + 连字符的内容概括。例如 <code>2025-11-03-record-1-fix-login-bug.md</code>。</li>
+    <li><strong>指定一个目录</strong>：在目录中生成记录文件，文件名固定为 <code>YYYY-MM-DD-record-{x}-{work-content}.md</code>（工作记录）或 <code>YYYY-MM-DD-task-{x}-{task-content}.md</code>（任务记录）：日期精确到天，<code>x</code> 是从 1 开始的当日序号，两类<strong>各自独立编号</strong>（同日已有同类记录时取该类当前最大值 +1），内容词是几个英文单词 + 连字符的概括。例如 <code>2025-11-03-record-1-fix-login-bug.md</code>、<code>2025-11-03-task-1-wiki-dark-mode.md</code>。</li>
     <li><strong>什么都没指定</strong>：如果用户或项目上下文中已经明确指定了用于本 skill 的记录目录，就用那个目录；否则拒绝执行，要求提供目录或文件路径。</li>
   </ul>
 </section>
@@ -306,17 +311,27 @@ footer {
 <section>
   <h2><span class="num">3</span> 记录什么</h2>
 
-  <p>记录的内容规则：</p>
+  <p>两类记录的规则：</p>
+
+  <p><strong>工作记录</strong>：</p>
 
   <ul>
-    <li><strong>只记已完成的事实</strong>：写了什么代码、写了什么文档、运行了什么命令、调研了什么、提交或沟通了什么。</li>
-    <li><strong>不记</strong>未来计划、未完成部分、未查明的事实、推测；不做任何修饰。</li>
-    <li>正文记录<strong>精确到分钟、带时区</strong>的时间；上下文中已有工作时间区间或重要时刻时记那些，否则记录本次写记录的时刻。</li>
+    <li><strong>只记已完成的事实</strong>：写了什么代码、写了什么文档、运行了什么命令、调研了什么、提交或沟通了什么；<strong>不记</strong>未来计划、未完成部分、未查明的事实、推测。</li>
     <li>处于 git 仓库且改动<strong>已提交</strong>时，记录 commit ID。</li>
-    <li>一次调用只产出一个文件；本 session 已经用过一次时，只记录上次记录之后的增量。</li>
+    <li>本 session 已经用过一次时，只记录上次记录之后的增量。</li>
   </ul>
 
-  <p>如果目标目录里已有与本次工作内容<strong>高度相似</strong>的记录，skill 会停下来询问是否合并进那份既有记录。合并后会把整个文件改写成一次成文的样式（时间部分保持不变），并重新检查文件名中的工作内容概括是否仍然贴切。</p>
+  <p><strong>任务记录</strong>：</p>
+
+  <ul>
+    <li><strong>只记任务本身</strong>：任务内容、背景、完成标准、截止时间、布置人/来源；可知才写，不编造。</li>
+    <li><strong>本地自包含</strong>：涉及本地文件时把要点内联进文件，不写"见 ./xxx"，不引用其他本地记录；在线 URL 可以保留；<strong>严禁</strong>写入密钥、token、密码等凭证信息。</li>
+    <li>写之前会审视 agent 自身配置的指令、skill、MCP 工具和项目文档，把与任务相关的事实内联补全背景；可以调用它们的只读能力查细节（如从日历确认截止时间），不做写操作。</li>
+  </ul>
+
+  <p>两类通用：文风准确、极简、客观，不做任何修饰；正文记录<strong>精确到分钟、带时区</strong>的时间（上下文中已有相关时间区间或重要时刻时记那些，否则记本次写记录的时刻）；一次调用只产出一个文件。</p>
+
+  <p>如果目标目录里已有与本次内容<strong>高度相似</strong>的同类记录（task 只和 task 比，record 只和 record 比），skill 会停下来询问是否合并进那份既有记录。合并后会把整个文件改写成一次成文的样式（时间部分保持不变），并重新检查文件名中的内容概括是否仍然贴切。</p>
 </section>
 
 <!-- ==================== 安装 ==================== -->
