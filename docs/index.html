@@ -280,7 +280,7 @@ footer {
 <section>
   <h2><span class="num">1</span> 这是什么</h2>
 
-  <p>这个项目是一个 agent skill：<strong>put-on-record（记录在案）</strong>。它把当前 session 相关的事情整理成客观、极简的 Markdown 文件，作为日后的工作历史，分两类：</p>
+  <p>这个项目包含两个配套的 agent skill：<strong>put-on-record（记录在案）</strong>负责记录，<strong>tidy-on-record（整理在案）</strong>负责整理。前者把当前 session 相关的事情整理成客观、极简的 Markdown 文件，作为日后的工作历史，分两类：</p>
 
   <ul>
     <li><strong>工作记录</strong>（<code>record</code>）：把<strong>已经做过的工作</strong>总结成工作记录——这是<strong>用户本人的工作记录</strong>，以用户第一人称"我"来写（agent 做的事算用户做的），只记已发生的事实，不记计划与推测。</li>
@@ -331,27 +331,54 @@ footer {
     <li>写之前会审视当前上下文（AGENTS.md、项目文档、MCP 工具等），把与任务相关的事实内联补全背景；可以调用它们的只读能力查细节（如从日历确认截止时间），不做写操作。</li>
   </ul>
 
-  <p>两类通用：文风准确、极简、客观，不做任何修饰；正文记录<strong>精确到分钟、带时区</strong>的时间（上下文中已有相关时间区间或重要时刻时记那些，否则记本次写记录的时刻）；一次调用只产出一个文件。</p>
+  <p>两类通用：文风准确、极简、客观，不做任何修饰；正文记录<strong>精确到分钟、带时区</strong>的时间（上下文中已有相关时间区间或重要时刻时记那些；只有"今天下午"这类模糊时段或没有时间信息时，记本次写记录的时刻）；一次调用只产出一个文件。</p>
 
-  <p>如果目标目录里已有与本次内容<strong>高度相似</strong>的同类记录（task 只和 task 比，record 只和 record 比），skill 会停下来询问是否合并进那份既有记录。合并后会把整个文件改写成一次成文的样式（时间部分保持不变），并重新检查文件名中的内容概括是否仍然贴切。</p>
+  <p>如果目标目录里已有与本次内容<strong>高度相似</strong>的同类记录（task 只和 task 比，record 只和 record 比；已被整理进主题子目录的记录同样参与比较），skill 会停下来询问是否合并进那份既有记录。合并后会把整个文件改写成一次成文的样式（时间部分保持不变），并重新检查文件名中的内容概括是否仍然贴切。</p>
+</section>
+
+<!-- ==================== 整理与索引 ==================== -->
+<section>
+  <h2><span class="num">4</span> 整理与索引</h2>
+
+  <p>长期使用后，记录目录会越来越扁平、越堆越多。配套的 <strong>tidy-on-record（整理在案）</strong> 负责定期整理：把根目录里扁平的记录按<strong>任务或工作内容</strong>归入主题子目录，把同一项工作下<strong>高度相似</strong>的记录合并成一份并简化描述，同时维护索引。</p>
+
+  <p>整理后的目录形如：</p>
+
+  <pre><code>&lt;记录根目录&gt;/
+├── INDEX.md                 # 总索引：主题导航 + 统计
+├── auth-refactor/           # 主题目录：一项工作 / 一个任务
+│   ├── INDEX.md             # 主题索引：时间、类型、文件、摘要
+│   └── 记录文件...
+├── misc/                    # 归不进任何主题的兜底
+└── _trash/&lt;时间戳&gt;/          # 合并时移出的原件，可恢复</code></pre>
+
+  <p><code>put-on-record</code> 始终把新记录写在根层（收件箱），由 tidy 归档进主题目录。索引是两级 Markdown（根 + 每主题），人可直接读、agent 也能增量维护；索引即归档状态，每次整理先核对索引与文件系统、以文件系统为准修复漂移，重复运行安全。</p>
+
+  <p>合并只针对<strong>同类型、同主题、确属同一项工作且要点高度重叠</strong>的记录；合并后时间取覆盖区间、正文去重简化，<strong>不删事实、不编造</strong>。拿不准的不合并，列为候选。合并前的原件移入 <code>_trash/</code>，不会直接删除。</p>
+
+  <div class="card">
+    <p><strong>怎么触发</strong>：对 agent 说"整理在案"、"整理工作记录"、"归档工作记录"、"合并同类工作记录"、"给工作记录建索引"等。默认先给出整理方案、确认后执行；在定时任务的 prompt 里写"直接执行，不用询问"即可进入自动模式（当天新增只归档不合并、低置信不合并、绝不删除）。需要定期整理时，在 agent 工具的定时任务里配置：</p>
+    <pre><code>整理在案：整理 &lt;记录根目录&gt;，无人值守，直接执行，不用询问，结束后给出整理简报。</code></pre>
+  </div>
 </section>
 
 <!-- ==================== 安装 ==================== -->
 <section>
-  <h2><span class="num">4</span> 安装</h2>
+  <h2><span class="num">5</span> 安装</h2>
 
   <p>没有安装脚本。先把仓库克隆到本地，再把 skill 目录复制或软链接到你 agent 工具的 skills 目录：</p>
 
   <pre><code># 1. 克隆仓库到本地
 git clone https://github.com/kuwii/put-on-record.git
 
-# 2. 以 pi coding agent 为例，软链接（或复制）skill 目录
+# 2. 以 pi coding agent 为例，软链接（或复制）两个 skill 目录
 ln -s /path/to/put-on-record/skills-cn/put-on-record ~/.pi/agent/skills/put-on-record
+ln -s /path/to/put-on-record/skills-cn/tidy-on-record ~/.pi/agent/skills/tidy-on-record
 
 # 或者复制
-cp -r /path/to/put-on-record/skills-cn/put-on-record ~/.pi/agent/skills/</code></pre>
+cp -r /path/to/put-on-record/skills-cn/put-on-record /path/to/put-on-record/skills-cn/tidy-on-record ~/.pi/agent/skills/</code></pre>
 
-  <p class="muted">其他 agent 工具（Claude Code、Codex 等）同理，放到各自的 skills 目录即可。如果不确定自己的 agent 工具的 skills 目录在哪里，直接问它一句就行。</p>
+  <p class="muted">两个 skill 可以单独安装；配合使用效果最好。其他 agent 工具（Claude Code、Codex 等）同理，放到各自的 skills 目录即可。如果不确定自己的 agent 工具的 skills 目录在哪里，直接问它一句就行。</p>
 </section>
 
 <div class="end-mark">· · ·</div>
